@@ -1,6 +1,8 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import { registerValidator } from './Validators/auth.js';
+import { validationResult } from 'express-validator';
 
 const app = express();
 
@@ -19,18 +21,15 @@ app.get('/', (req, res) => {
   res.send('тест снова');
 });
 
-app.post('/auth', (req, res) => {
-  const token = jwt.sign(
-    {
-      login: req.body.login,
-      password: req.body.password,
-    },
-    'Sergey213',
-  );
+app.post('/auth/register', registerValidator, (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors.array());
+  }
 
   res.json({
     success: true,
-    token,
   });
 });
 
